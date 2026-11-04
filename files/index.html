@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roteiro de Bolso | Sua Lista de Entretenimento</title>
+  <link rel="icon" href="logo.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-tema="filmes">
+
+  <!-- CABEÇALHO -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" id="logo-home" class="logo-link" title="Voltar ao início">
+        <img src="logo.png" alt="Logo Roteiro de Bolso" class="logo-img">
+        <h1 class="logo">Roteiro de Bolso</h1>
+      </a>
+      <p class="subtitle">Explore. Salve. Aproveite.</p>
+    </div>
+  </header>
+
+  <!-- CONTAINER CENTRAL (BUSCA E RESULTADOS) -->
+  <main class="main-wrapper">
+    <section class="panel-box top-panel">
+      <div class="hero-text">
+        <h2>Sua lista de <span>entretenimento</span> em um só lugar!</h2>
+        <p>Busque por livros ou filmes, descubra, organize e nunca mais perca o que quer ver ou ler.</p>
+      </div>
+
+      <!-- ABAS: FILMES / LIVROS -->
+      <div class="busca-abas" role="tablist">
+        <span class="aba-indicador"></span>
+        <button type="button" role="tab" class="aba ativa" data-tipo="filme">🎬 Filmes</button>
+        <button type="button" role="tab" class="aba" data-tipo="livro">📚 Livros</button>
+      </div>
+
+      <form id="form-busca" class="search-form">
+        <div class="search-wrapper">
+          <input type="text" id="busca-titulo" placeholder="Digite o título (Ex: Harry Potter)..." required>
+          <!-- select escondido: mantém o tipo escolhido nas abas (usado pelo script.js) -->
+          <select id="busca-tipo" class="hidden">
+            <option value="filme">Filmes</option>
+            <option value="livro">Livros</option>
+          </select>
+          <button type="submit" class="btn-search">🔍 Buscar</button>
+        </div>
+      </form>
+
+      <!-- NOVO: Container de sugestão ortográfica -->
+      <div id="sugestao-ortografica" class="hidden">
+        Você quis dizer: <span id="termo-sugerido" class="sugestao-link"></span>?
+      </div>
+
+      <!-- Resultados da API -->
+      <div id="resultados-busca" class="grid-resultados hidden"></div>
+    </section>
+  </main>
+
+  <!-- CONTAINER INFERIOR SEPARADO (LISTA SALVA) -->
+  <section class="bottom-list-section">
+    <div class="list-container">
+      <div class="list-header">
+        <h2>Meus Itens Salvos</h2>
+        <form id="form-filtros" class="filters-form">
+          <select id="filtro-tipo">
+            <option value="">Todos os tipos</option>
+            <option value="filme">Filme</option>
+            <option value="livro">Livro</option>
+          </select>
+          <select id="filtro-genero">
+            <option value="">Todos os gêneros</option>
+            <!-- Preenchido via JS -->
+          </select>
+          <input type="number" id="filtro-ano" placeholder="Ano (Ex: 2010)" min="1800" max="2030">
+        </form>
+      </div>
+
+      <div id="lista-salva" class="grid-salvos">
+        <!-- Cards gerados via JS -->
+      </div>
+      <p id="msg-vazio" class="hidden msg-empty">Sua lista está vazia. Busque e adicione itens acima!</p>
+    </div>
+  </section>
+
+  <!-- RODAPÉ -->
+  <footer>
+    <p>Roteiro de Bolso &copy; 2026 - Projeto SPA CRUD</p>
+  </footer>
+
+  <!-- MODAL DE DETALHES E SALVAMENTO -->
+  <div id="modal-item" class="modal hidden">
+    <div class="modal-content dark-modal">
+      <span class="close-btn" id="fechar-modal">&times;</span>
+      
+      <div class="modal-layout">
+        <!-- Esquerda: Imagem e Trailer -->
+        <div class="modal-media">
+          <img id="modal-img" src="" alt="Capa">
+          <a id="btn-trailer" class="btn-trailer hidden" href="#" target="_blank" rel="noopener noreferrer">▶ Assistir trailer</a>
+          <button type="button" id="btn-criar-sala" class="btn-sala">🎟 Criar sala de cinema</button>
+          <div id="links-livro" class="links-livro hidden">
+            <a id="btn-estante" class="btn-loja btn-estante" href="#" target="_blank" rel="noopener noreferrer">📚 Comprar na Estante Virtual</a>
+            <a id="btn-amazon" class="btn-loja btn-amazon" href="#" target="_blank" rel="noopener noreferrer">Amazon</a>
+            <a id="btn-ml" class="btn-loja btn-ml" href="#" target="_blank" rel="noopener noreferrer">Mercado Livre</a>
+          </div>
+          <div id="trailer-container" class="hidden trailer-box">
+            <h3>Trailer</h3>
+            <video id="modal-trailer" controls width="100%"></video>
+          </div>
+        </div>
+
+        <!-- Direita: Informações e Formulário -->
+        <div class="modal-details">
+          <h2 id="modal-titulo">Detalhes</h2>
+          <div class="badges-row">
+            <span class="badge" id="modal-genero"></span>
+            <span class="badge" id="modal-ano"></span>
+          </div>
+          <p class="sinopse" id="modal-sinopse"></p>
+
+          <form id="form-salvar" class="form-salvar">
+            <input type="hidden" id="item-id">
+            
+            <div class="input-group">
+              <label for="item-status">Meu status:</label>
+              <select id="item-status" required>
+                <option value="Quero ver/ler">Gostaria de ver/ler</option>
+                <option value="Já vi/li">Já vi/li</option>
+                <option value="Abandonado">Abandonado</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="item-comentario">Comentário (opcional):</label>
+              <textarea id="item-comentario" rows="3" placeholder="Sua opinião sobre esta obra..."></textarea>
+            </div>
+            
+            <div class="modal-actions">
+              <button type="submit" class="btn-primary" id="btn-salvar-modal">Salvar na minha lista</button>
+              <button type="button" class="btn-danger hidden" id="btn-deletar-modal">🗑 Excluir da Lista</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CRIAR SALA -->
+  <div id="modal-nova-sala" class="modal hidden">
+    <div class="modal-content dark-modal" style="max-width:480px">
+      <span class="close-btn" id="fechar-nova-sala">&times;</span>
+      <h2 id="nova-sala-titulo">Criar sala</h2>
+      <form id="form-nova-sala" class="form-salvar">
+        <div class="input-group"><label for="sala-apelido">Seu apelido:</label><input id="sala-apelido" required maxlength="20"></div>
+        <div class="input-group"><label for="sala-data">Data e hora do encontro:</label><input type="datetime-local" id="sala-data" required></div>
+        <div class="input-group"><label for="sala-local">Onde? (endereço ou link da chamada):</label><input id="sala-local" maxlength="100"></div>
+        <button type="submit" class="btn-primary">Criar sala</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- BOTÃO FLUTUANTE + PAINEL LATERAL: SALAS DE CINEMA E CLUBES DE LEITURA -->
+  <button id="btn-abrir-salas" class="fab-salas" title="Salas de cinema e clubes de leitura">
+    <img src="logo.png" alt="Abrir salas">
+    <span id="badge-salas" class="badge-salas hidden">0</span>
+  </button>
+
+  <aside id="painel-salas" class="painel-salas">
+    <header class="painel-header">
+      <button id="voltar-salas" class="painel-btn hidden" title="Voltar às salas">&larr;</button>
+      <h3 id="painel-titulo">🎟 Salas e Clubes</h3>
+      <button id="fechar-painel" class="painel-btn" title="Fechar">&times;</button>
+    </header>
+
+    <div id="vista-lista" class="painel-corpo">
+      <p id="aviso-salas" class="msg-empty hidden"></p>
+      <div id="lista-salas" class="lista-salas"></div>
+    </div>
+
+    <div id="vista-chat" class="painel-corpo hidden">
+      <p id="sala-info" class="sala-info"></p>
+      <div id="chat-msgs" class="chat-msgs"></div>
+      <form id="form-chat" class="chat-form">
+        <input id="chat-texto" required maxlength="300" placeholder="Escreva uma mensagem...">
+        <button type="submit" class="btn-primary">Enviar</button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Firebase (banco em tempo real compartilhado entre os amigos) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
